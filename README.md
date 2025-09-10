@@ -1,1 +1,1 @@
-https://ajoealex.github.io/static-sites.github.io
+https://ajoealex.github.io/static-sites
