@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employee Directory</title>
+  <style>
+    :root { font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: #f9f9f9; color: #222; }
+    header { padding: 16px 20px; background: #1976d2; color: #fff; border-bottom: 1px solid #ccc; position: sticky; top: 0; z-index: 10; }
+    header h1 { margin: 0; font-size: 18px; }
+    main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,.1); overflow: hidden; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #eee; background: #f5f5f5; }
+    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; color: #333; }
+    .toolbar { display: flex; gap: 12px; align-items: center; }
+    .search { border: 1px solid #ccc; border-radius: 6px; padding: 6px 10px; min-width: 220px; }
+    .btn { cursor: pointer; background: #1976d2; border: none; color: #fff; border-radius: 6px; padding: 6px 12px; font-weight: 600; }
+    .btn:hover { background: #135ba1; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { text-align: left; font-size: 12px; color: #555; letter-spacing: .08em; text-transform: uppercase; padding: 12px 14px; background: #f1f1f1; border-bottom: 1px solid #ddd; }
+    tbody td { padding: 12px 14px; border-bottom: 1px solid #eee; font-size: 14px; }
+    tbody tr:hover { background: #f9f9f9; }
+    a.emp-link { color: #1976d2; text-decoration: none; font-weight: 600; }
+    a.emp-link:focus, a.emp-link:hover { text-decoration: underline; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; background: #e3f2fd; font-size: 12px; color: #1976d2; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .detail-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 18px; padding: 18px; }
+    .kv { color: #555; font-size: 13px; }
+    .v { font-weight: 600; color: #222; }
+    .backbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f5f5f5; border-bottom: 1px solid #eee; }
+    .link { color: #1976d2; text-decoration: none; font-weight: 600; }
+    .link:hover { text-decoration: underline; }
+    .muted { color: #777; font-size: 13px; }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    .pagination { padding: 12px; text-align: right; }
+    .pagination .btn { margin: 0 4px; }
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#content">Skip to content</a>
+  <header>
+    <h1>Employee Directory</h1>
+  </header>
+  <main id="content" aria-live="polite">
+    <!-- LIST VIEW -->
+    <section id="screen-list" class="screen active" aria-labelledby="list-title" role="region">
+      <div class="card" role="group" aria-describedby="list-desc">
+        <div class="card-header">
+          <h2 id="list-title">Employees</h2>
+          <div class="toolbar">
+            <input id="q" class="search" type="search" placeholder="Search name, dept, role" aria-label="Search employees" />
+            <button id="clear" class="btn" type="button">Clear</button>
+            <input id="pageSize" type="number" min="1" value="20" class="search" style="width:80px" aria-label="Records per page" />
+          </div>
+        </div>
+        <p id="list-desc" class="sr-only">Click an Employee ID to open a detail view. Use Back to List to return.</p>
+        <div style="overflow:auto">
+          <table aria-describedby="list-desc">
+            <thead>
+              <tr>
+                <th scope="col">Employee ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Department</th>
+                <th scope="col">Role</th>
+                <th scope="col">Email</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </section>
+
+    <!-- DETAIL VIEW -->
+    <section id="screen-detail" class="screen" aria-labelledby="detail-title" role="region">
+      <div class="card">
+        <div class="backbar">
+          <a id="back-link" href="#list" class="link">← Back to list</a>
+          <span class="muted" id="detail-breadcrumb">Employee</span>
+        </div>
+        <div class="card-header">
+          <h2 id="detail-title">Employee Profile</h2>
+        </div>
+        <div class="detail-grid">
+          <div class="kv">Employee ID</div><div class="v" id="d-id"></div>
+          <div class="kv">Name</div><div class="v" id="d-name"></div>
+          <div class="kv">Department</div><div class="v" id="d-dept"></div>
+          <div class="kv">Role</div><div class="v" id="d-role"></div>
+          <div class="kv">Email</div><div class="v" id="d-email"></div>
+          <div class="kv">Phone</div><div class="v" id="d-phone"></div>
+          <div class="kv">Location</div><div class="v" id="d-location"></div>
+          <div class="kv">Employment</div><div class="v" id="d-status"></div>
+        </div>
+        <div style="padding: 0 18px 18px 18px; display:flex; gap:12px;">
+          <a id="mailto" class="btn" href="#">Email employee</a>
+          <button class="btn" id="back-btn" type="button">Back to list</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Enforce ?record with fallback=30
+    (function enforceRecordParam() {
+      const params = new URLSearchParams(location.search);
+      const raw = params.get('record');
+      const num = raw && !isNaN(raw) ? parseInt(raw, 10) : NaN;
+      if (!raw || isNaN(num) || num < 1) {
+        params.set('record', '30');
+        const newUrl = `${location.pathname}?${params.toString()}${location.hash}`;
+        location.replace(newUrl);
+      }
+    })();
+
+    const FIXED_EMPLOYEES = [
+      { id: "E1001", name: "Priya Nair", dept: "Engineering", role: "Senior QA Engineer", email: "priya.nair@example.com", phone: "+65 8123 4567", location: "Singapore", status: "Active" },
+      { id: "E1002", name: "Ravi Kumar", dept: "Engineering", role: "Software Engineer", email: "ravi.kumar@example.com", phone: "+65 9888 1122", location: "Singapore", status: "Active" },
+      { id: "E1003", name: "Aisha Tan", dept: "Product", role: "Product Manager", email: "aisha.tan@example.com", phone: "+65 9234 7788", location: "Singapore", status: "Active" },
+      { id: "E1004", name: "Daniel Lim", dept: "Design", role: "UX Designer", email: "daniel.lim@example.com", phone: "+65 9456 7788", location: "Singapore", status: "On Leave" },
+      { id: "E1005", name: "Meera Shah", dept: "Engineering", role: "DevOps Engineer", email: "meera.shah@example.com", phone: "+65 9345 2233", location: "Singapore", status: "Active" }
+    ];
+
+    function generateRandomEmployee(idx) {
+      const depts = ["Engineering","HR","Finance","Design","Product","Sales"];
+      const roles = ["Engineer","Manager","Analyst","Designer","Lead","Specialist"];
+      const names = ["Alex","Sam","Jordan","Taylor","Morgan","Chris","Jamie","Cameron","Dana","Riley"];
+      const surnames = ["Tan","Lee","Kumar","Shah","Lim","Ng","Chen","Wong"];
+      const name = names[Math.floor(Math.random()*names.length)] + " " + surnames[Math.floor(Math.random()*surnames.length)];
+      const dept = depts[Math.floor(Math.random()*depts.length)];
+      const role = roles[Math.floor(Math.random()*roles.length)];
+      return {
+        id: "E" + (1006+idx),
+        name,
+        dept,
+        role,
+        email: name.toLowerCase().replace(/ /g,".")+"@example.com",
+        phone: "+65 9" + Math.floor(1000000+Math.random()*8999999),
+        location: "Singapore",
+        status: Math.random()>0.2?"Active":"On Leave"
+      };
+    }
+
+    const params = new URLSearchParams(location.search);
+    const recordCount = parseInt(params.get('record'), 10) || 30;
+
+    const RANDOM_EMPLOYEES = Array.from({length: recordCount}, (_,i)=>generateRandomEmployee(i+1));
+    const EMPLOYEES = [...FIXED_EMPLOYEES, ...RANDOM_EMPLOYEES];
+
+    const $ = (sel) => document.querySelector(sel);
+    const tbody = $("#tbody");
+    const q = $("#q");
+    const pageSizeInput = $("#pageSize");
+    const pagination = $("#pagination");
+    let currentPage = 1;
+
+    function renderPagination(totalPages) {
+      let html = '';
+      if (currentPage > 1) {
+        html += `<button class="btn" id="prevPage">Prev</button> `;
+      }
+      html += `Page ${currentPage} of ${totalPages}`;
+      if (currentPage < totalPages) {
+        html += ` <button class="btn" id="nextPage">Next</button>`;
+      }
+      pagination.innerHTML = html;
+
+      const prev = document.getElementById("prevPage");
+      if (prev) prev.addEventListener("click", () => {
+        currentPage--;
+        renderTable(filterRows(q.value));
+      });
+
+      const next = document.getElementById("nextPage");
+      if (next) next.addEventListener("click", () => {
+        currentPage++;
+        renderTable(filterRows(q.value));
+      });
+    }
+
+    function renderTable(rows) {
+      const pageSize = Math.max(1, parseInt(pageSizeInput.value)||20);
+      const start = (currentPage-1)*pageSize;
+      const end = start+pageSize;
+      const pageRows = rows.slice(start,end);
+      tbody.innerHTML = pageRows.map(r => `
+        <tr>
+          <td><a class="emp-link" href="#emp=${r.id}" data-id="${r.id}">${r.id}</a></td>
+          <td>${r.name}</td>
+          <td><span class="badge">${r.dept}</span></td>
+          <td>${r.role}</td>
+          <td><a class="link" href="mailto:${r.email}">${r.email}</a></td>
+          <td>${r.status}</td>
+        </tr>`).join("");
+      const totalPages = Math.ceil(rows.length/pageSize);
+      renderPagination(totalPages);
+    }
+
+    function filterRows(term) {
+      const t = term.trim().toLowerCase();
+      if (!t) return EMPLOYEES;
+      return EMPLOYEES.filter(r =>
+        r.id.toLowerCase().includes(t) ||
+        r.name.toLowerCase().includes(t) ||
+        r.dept.toLowerCase().includes(t) ||
+        r.role.toLowerCase().includes(t) ||
+        r.email.toLowerCase().includes(t)
+      );
+    }
+
+    // Events
+    q.addEventListener("input", () => { currentPage=1; renderTable(filterRows(q.value)); });
+    $("#clear").addEventListener("click", () => { q.value=""; currentPage=1; renderTable(EMPLOYEES); q.focus(); });
+    pageSizeInput.addEventListener("change", () => { currentPage=1; renderTable(filterRows(q.value)); });
+
+    renderTable(EMPLOYEES);
+  </script>
+</body>
+</html>
