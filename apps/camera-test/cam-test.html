@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Camera Capture</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f1f5f9;
+      font-family: "Inter", system-ui, sans-serif;
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .sub {
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    video, canvas {
+      width: 100%;
+      max-height: 380px;
+      background: #000;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .toolbar {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 18px;
+      background: #0f172a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button.secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .output-block {
+      margin-top: 24px;
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .output-block h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    img, video.recorded {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .download {
+      color: #2563eb;
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Camera Capture</h1>
+    <p class="sub">Capture high resolution photos and videos using your device camera.</p>
+
+    <video id="preview" autoplay playsinline></video>
+    <canvas id="photoCanvas" style="display:none;"></canvas>
+
+    <div class="toolbar">
+      <button id="startCamera">Start camera</button>
+      <button id="stopCamera" class="secondary" disabled>Stop</button>
+
+      <button id="takePhoto" disabled>Photo</button>
+
+      <button id="startRecording" disabled>Record</button>
+      <button id="stopRecording" class="secondary" disabled>Stop Recording</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="output-block">
+      <h3>Captured Photo</h3>
+      <img id="photoPreview" style="display:none;" />
+      <a id="downloadPhoto" class="download" href="#" download="photo.png" style="display:none;">Download photo</a>
+    </div>
+
+    <div class="output-block">
+      <h3>Recorded Video</h3>
+      <video id="recordedVideo" class="recorded" controls style="display:none;"></video>
+      <a id="downloadVideo" class="download" href="#" download="video.webm" style="display:none;">Download video</a>
+    </div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById("startCamera");
+    const stopBtn = document.getElementById("stopCamera");
+    const photoBtn = document.getElementById("takePhoto");
+    const recStartBtn = document.getElementById("startRecording");
+    const recStopBtn = document.getElementById("stopRecording");
+
+    const preview = document.getElementById("preview");
+    const canvas = document.getElementById("photoCanvas");
+    const photoPreview = document.getElementById("photoPreview");
+    const downloadPhoto = document.getElementById("downloadPhoto");
+
+    const recordedVideo = document.getElementById("recordedVideo");
+    const downloadVideo = document.getElementById("downloadVideo");
+
+    const statusEl = document.getElementById("status");
+
+    let stream = null;
+    let mediaRecorder = null;
+    let chunks = [];
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: true
+        });
+
+        preview.srcObject = stream;
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        photoBtn.disabled = false;
+        recStartBtn.disabled = false;
+
+        setStatus("Camera ready.");
+      } catch (err) {
+        setStatus("Camera access blocked.");
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        preview.srcObject = null;
+      }
+
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      photoBtn.disabled = true;
+      recStartBtn.disabled = true;
+      recStopBtn.disabled = true;
+
+      setStatus("Camera stopped.");
+    }
+
+    function takePhoto() {
+      const track = stream.getVideoTracks()[0];
+      const settings = track.getSettings();
+
+      canvas.width = settings.width || preview.videoWidth;
+      canvas.height = settings.height || preview.videoHeight;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(preview, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        photoPreview.src = url;
+        photoPreview.style.display = "block";
+        downloadPhoto.href = url;
+        downloadPhoto.style.display = "inline-block";
+      });
+
+      setStatus("Photo captured.");
+    }
+
+    function startRecording() {
+      chunks = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        recordedVideo.src = url;
+        recordedVideo.style.display = "block";
+        downloadVideo.href = url;
+        downloadVideo.style.display = "inline-block";
+        setStatus("Recording saved.");
+      };
+
+      mediaRecorder.start();
+      recStartBtn.disabled = true;
+      recStopBtn.disabled = false;
+
+      setStatus("Recording...");
+    }
+
+    function stopRecording() {
+      mediaRecorder.stop();
+      recStartBtn.disabled = false;
+      recStopBtn.disabled = true;
+    }
+
+    startBtn.addEventListener("click", startCamera);
+    stopBtn.addEventListener("click", stopCamera);
+    photoBtn.addEventListener("click", takePhoto);
+    recStartBtn.addEventListener("click", startRecording);
+    recStopBtn.addEventListener("click", stopRecording);
+  </script>
+</body>
+</html>
