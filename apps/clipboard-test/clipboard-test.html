@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copy Paste Utility</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-width: 420px;
+        }
+        input {
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 14px;
+            background: #0078d4;
+            color: white;
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:active {
+            opacity: 0.85;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        #copyStatus, #pasteStatus {
+            font-size: 14px;
+            color: green;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Copy Section</h3>
+    <div class="row">
+        <input id="copyInput" type="text" placeholder="Enter text to copy" />
+        <button id="copyBtn">Copy</button>
+    </div>
+    <div id="copyStatus">Copied</div>
+
+    <h3>Paste Section</h3>
+    <div class="row">
+        <input id="pasteInput" type="text" placeholder="Paste output appears here" />
+        <button id="pasteBtn">Paste</button>
+    </div>
+    <div id="pasteStatus">Pasted</div>
+
+    <script>
+        const copyInput = document.getElementById("copyInput");
+        const pasteInput = document.getElementById("pasteInput");
+
+        const copyBtn = document.getElementById("copyBtn");
+        const pasteBtn = document.getElementById("pasteBtn");
+
+        const copyStatus = document.getElementById("copyStatus");
+        const pasteStatus = document.getElementById("pasteStatus");
+
+        copyBtn.addEventListener("click", async () => {
+            const value = copyInput.value.trim();
+            if (!value) return;
+
+            try {
+                await navigator.clipboard.writeText(value);
+                copyStatus.style.visibility = "visible";
+                setTimeout(() => copyStatus.style.visibility = "hidden", 1500);
+            } catch (e) {
+                console.error("Copy failed", e);
+            }
+        });
+
+        pasteBtn.addEventListener("click", async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                pasteInput.value = text;
+                pasteStatus.style.visibility = "visible";
+                setTimeout(() => pasteStatus.style.visibility = "hidden", 1500);
+            } catch (e) {
+                console.error("Paste failed", e);
+            }
+        });
+    </script>
+
+</body>
+</html>

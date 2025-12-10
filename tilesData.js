@@ -7,5 +7,6 @@ const tilesData = [
     { name: "OptGroup", link: "https://ajoealex.github.io/static-sites/apps/form/optGroup.html" },
     { name: "long form", link: "https://ajoealex.github.io/static-sites/apps/form/employee_registration_form_extended_200.html" },
     { name: "demo shopping site", link: "https://ajoealex.github.io/static-sites/apps/shopping-site-demo/amazon_like_app.html" },
-    { name: "cam test", link: "https://ajoealex.github.io/static-sites/apps/camera-test/cam-test.html" }
+    { name: "cam test", link: "https://ajoealex.github.io/static-sites/apps/camera-test/cam-test.html" },
+    { name: "clipboard test", link: "https://ajoealex.github.io/static-sites/apps/clipboard-test/clipboard-test.html" }
 ];
