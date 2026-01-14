@@ -1,155 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Product Search</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Search</title>
 
-<style>
-    :root {
-        --flipkart-blue: #2874f0;
-        --bg: #f1f3f6;
-        --card-bg: #ffffff;
-        --text-dark: #212121;
-        --text-muted: #878787;
-    }
+    <style>
+        :root {
+            --flipkart-blue: #2874f0;
+            --bg: #f1f3f6;
+            --card-bg: #ffffff;
+            --text-dark: #212121;
+            --text-muted: #878787;
+        }
 
-    * {
-        box-sizing: border-box;
-        font-family: Arial, Helvetica, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-    body {
-        margin: 0;
-        background: var(--bg);
-    }
+        body {
+            margin: 0;
+            background: var(--bg);
+        }
 
-    .header {
-        background: var(--flipkart-blue);
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+        .header {
+            background: var(--flipkart-blue);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .header button {
-        background: #fff;
-        border: none;
-        padding: 8px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        color: var(--flipkart-blue);
-        font-weight: bold;
-    }
+        .header button {
+            background: #fff;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--flipkart-blue);
+            font-weight: bold;
+        }
 
-    .search-box {
-        flex: 1;
-        display: flex;
-        background: #fff;
-        border-radius: 4px;
-        overflow: hidden;
-    }
+        .search-box {
+            flex: 1;
+            display: flex;
+            background: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-    .search-box input[type="search"] {
-        flex: 1;
-        border: none;
-        padding: 10px;
-        font-size: 14px;
-        outline: none;
-    }
+        .search-box input[type="search"] {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            outline: none;
+        }
 
-    .search-box button {
-        background: #fff;
-        border: none;
-        padding: 0 14px;
-        cursor: pointer;
-        font-size: 18px;
-        color: var(--flipkart-blue);
-    }
+        .search-box button {
+            background: #fff;
+            border: none;
+            padding: 0 14px;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--flipkart-blue);
+        }
 
-    .container {
-        padding: 12px;
-    }
+        .container {
+            padding: 12px;
+        }
 
-    .products {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px;
-    }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
 
-    .product {
-        background: var(--card-bg);
-        padding: 10px;
-        border-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-    }
+        .product {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+        }
 
-    .product img {
-        width: 100%;
-        height: 140px;
-        object-fit: contain;
-        margin-bottom: 8px;
-    }
+        .product img {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
 
-    .product-name {
-        font-size: 14px;
-        color: var(--text-dark);
-        margin-bottom: 4px;
-    }
+        .product-name {
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
 
-    .product-price {
-        font-size: 14px;
-        font-weight: bold;
-        color: var(--flipkart-blue);
-    }
+        .product-price {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--flipkart-blue);
+        }
 
-    .hidden {
-        display: none;
-    }
-</style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="header">
-    <button id="homeBtn">Home</button>
+    <div class="header">
+        <button id="homeBtn">Home</button>
 
-    <form id="searchForm" class="search-box">
-        <input
-            type="search"
-            id="searchInput"
-            placeholder="search product"
-            enterkeyhint="search"
-        />
-        <button type="submit">🔍</button>
-    </form>
+        <form id="searchForm" class="search-box">
+            <input type="search" id="searchInput" placeholder="search product" enterkeyhint="search" />
+            <button type="submit">🔍</button>
+        </form>
 
-    <button id="clearBtn">Clear</button>
-</div>
+        <button id="clearBtn">Clear</button>
+    </div>
 
-<div class="container">
-    <div id="productGrid" class="products"></div>
-</div>
+    <div class="container">
+        <div id="productGrid" class="products"></div>
+    </div>
 
-<script>
-    /* ---------- Product Source ---------- */
-    const PRODUCTS = [
-        { name: "iPhone 15", price: "₹79,999" },
-        { name: "Samsung Galaxy S24", price: "₹74,999" },
-        { name: "MacBook Air M2", price: "₹1,14,990" },
-        { name: "Sony Headphones", price: "₹19,999" },
-        { name: "Apple Watch Series 9", price: "₹41,999" }
-    ];
+    <script>
+        /* ---------- Product Source ---------- */
+        const PRODUCTS = [
+            // Mobiles
+            { name: "iPhone 15", price: "₹79,999" },
+            { name: "iPhone 15 Pro Max", price: "₹1,59,999" },
+            { name: "Samsung Galaxy S24", price: "₹74,999" },
+            { name: "Samsung Galaxy S24 Ultra", price: "₹1,29,999" },
+            { name: "Google Pixel 8 Pro", price: "₹1,06,999" },
+            { name: "OnePlus 12", price: "₹64,999" },
+            { name: "Nothing Phone (2)", price: "₹44,999" },
+            { name: "Xiaomi 14 Pro", price: "₹59,999" },
 
-    const grid = document.getElementById("productGrid");
-    const form = document.getElementById("searchForm");
-    const input = document.getElementById("searchInput");
-    const homeBtn = document.getElementById("homeBtn");
-    const clearBtn = document.getElementById("clearBtn");
+            // Laptops
+            { name: "MacBook Air M2", price: "₹1,14,990" },
+            { name: "MacBook Pro M3", price: "₹1,99,900" },
+            { name: "Dell XPS 13", price: "₹1,24,999" },
+            { name: "HP Spectre x360", price: "₹1,34,999" },
+            { name: "Lenovo ThinkPad X1 Carbon", price: "₹1,69,999" },
+            { name: "ASUS ROG Zephyrus G14", price: "₹1,59,999" },
 
-    function getDummyImage(label) {
-        return `data:image/svg+xml;utf8,
+            // Audio
+            { name: "Sony Noise Cancelling Headphones", price: "₹19,999" },
+            { name: "Sony WH-1000XM5", price: "₹34,990" },
+            { name: "Bose QuietComfort Ultra", price: "₹39,900" },
+            { name: "Apple AirPods Pro (2nd Gen)", price: "₹24,999" },
+            { name: "JBL Charge 5 Bluetooth Speaker", price: "₹14,999" },
+
+            // Wearables
+            { name: "Apple Watch Series 9", price: "₹41,999" },
+            { name: "Apple Watch Ultra 2", price: "₹89,900" },
+            { name: "Samsung Galaxy Watch 6", price: "₹36,999" },
+            { name: "Garmin Forerunner 965", price: "₹59,990" },
+
+            // Tablets
+            { name: "iPad Air (5th Gen)", price: "₹59,999" },
+            { name: "iPad Pro M2", price: "₹1,12,900" },
+            { name: "Samsung Galaxy Tab S9", price: "₹72,999" },
+
+            // Accessories
+            { name: "Apple Magic Keyboard", price: "₹29,900" },
+            { name: "Logitech MX Master 3S Mouse", price: "₹9,999" },
+            { name: "Samsung T7 Portable SSD 1TB", price: "₹9,499" },
+            { name: "Anker 65W USB-C Charger", price: "₹4,999" },
+
+            // TVs
+            { name: "Samsung 55-inch QLED 4K TV", price: "₹89,999" },
+            { name: "LG OLED 55-inch C3", price: "₹1,49,999" },
+            { name: "Sony Bravia XR 65-inch", price: "₹1,79,999" }
+        ];
+
+
+        const grid = document.getElementById("productGrid");
+        const form = document.getElementById("searchForm");
+        const input = document.getElementById("searchInput");
+        const homeBtn = document.getElementById("homeBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        function getDummyImage(label) {
+            return `data:image/svg+xml;utf8,
         <svg xmlns='http://www.w3.org/2000/svg' width='200' height='140'>
             <rect width='100%' height='100%' fill='%23f5f5f5'/>
             <text x='50%' y='50%' dominant-baseline='middle'
@@ -157,55 +195,56 @@
                 ${label}
             </text>
         </svg>`;
-    }
+        }
 
-    function renderProducts(list) {
-        grid.innerHTML = "";
-        list.forEach(p => {
-            const card = document.createElement("div");
-            card.className = "product";
-            card.dataset.name = p.name.toLowerCase();
+        function renderProducts(list) {
+            grid.innerHTML = "";
+            list.forEach(p => {
+                const card = document.createElement("div");
+                card.className = "product";
+                card.dataset.name = p.name.toLowerCase();
 
-            card.innerHTML = `
+                card.innerHTML = `
                 <img src="${getDummyImage(p.name)}">
                 <div class="product-name">${p.name}</div>
                 <div class="product-price">${p.price}</div>
             `;
-            grid.appendChild(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterProducts() {
+            const query = input.value.trim().toLowerCase();
+            const cards = document.querySelectorAll(".product");
+
+            cards.forEach(card => {
+                const name = card.dataset.name;
+                card.classList.toggle("hidden", query && !name.includes(query));
+            });
+        }
+
+        /* ---------- Events ---------- */
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            filterProducts();
         });
-    }
 
-    function filterProducts() {
-        const query = input.value.trim().toLowerCase();
-        const cards = document.querySelectorAll(".product");
-
-        cards.forEach(card => {
-            const name = card.dataset.name;
-            card.classList.toggle("hidden", query && !name.includes(query));
+        clearBtn.addEventListener("click", () => {
+            input.value = "";
+            document.querySelectorAll(".product")
+                .forEach(p => p.classList.remove("hidden"));
         });
-    }
 
-    /* ---------- Events ---------- */
-    form.addEventListener("submit", e => {
-        e.preventDefault();
-        filterProducts();
-    });
+        homeBtn.addEventListener("click", () => {
+            input.value = "";
+            renderProducts(PRODUCTS);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
 
-    clearBtn.addEventListener("click", () => {
-        input.value = "";
-        document.querySelectorAll(".product")
-            .forEach(p => p.classList.remove("hidden"));
-    });
-
-    homeBtn.addEventListener("click", () => {
-        input.value = "";
+        /* ---------- Initial Render ---------- */
         renderProducts(PRODUCTS);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    /* ---------- Initial Render ---------- */
-    renderProducts(PRODUCTS);
-</script>
+    </script>
 
 </body>
+
 </html>
