@@ -10,4 +10,5 @@ const tilesData = [
     { name: "cam test", link: "https://ajoealex.github.io/static-sites/apps/camera-test/cam-test.html" },
     { name: "clipboard test", link: "https://ajoealex.github.io/static-sites/apps/clipboard-test/clipboard-test.html" },
     { name: "Product Search", link: "https://ajoealex.github.io/static-sites/apps/product-search/index.html" }
+    { name: "Location Test", link: "https://ajoealex.github.io/static-sites/apps/location-test/index.html" }
 ];
