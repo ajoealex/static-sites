@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Resizable Cross-Domain iFrames</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #111;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .container {
+      width: 100%;
+    }
+
+    .iframe-section {
+      width: 100%;
+      border-bottom: 2px solid #e5e7eb;
+      background: #fff;
+    }
+
+    .iframe-meta {
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .iframe-wrapper {
+      width: 100%;
+      height: 500px;
+      resize: vertical;        /* Native draggable resize */
+      overflow: hidden;        /* Prevent scrollbars on wrapper */
+      min-height: 200px;
+      max-height: 90vh;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Full-Width Resizable Cross-Domain iFrames
+</header>
+
+<div id="iframeContainer" class="container"></div>
+
+<script>
+  // Configuration array (single source of truth)
+  const pages = [
+    {
+      title: "Wikipedia",
+      url: "https://en.wikipedia.org/wiki/Main_Page"
+    },
+    {
+      title: "Example.com (IANA)",
+      url: "https://example.com"
+    },
+    {
+      title: "bucket hit",
+      url: "https://databucket.automationhub.in/api/v1/bucket_data/403c4981-afc9-4f17-8330-737cdcfee54a/data"
+    },
+    {
+      title: "httpbin",
+      url: "https://httpbin.org/html"
+    }
+  ];
+
+  const container = document.getElementById("iframeContainer");
+
+  pages.forEach(page => {
+    const section = document.createElement("section");
+    section.className = "iframe-section";
+
+    const meta = document.createElement("div");
+    meta.className = "iframe-meta";
+    meta.textContent = `${page.title} | ${page.url}`;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "iframe-wrapper";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = page.url;
+    iframe.loading = "lazy";
+    iframe.referrerPolicy = "no-referrer";
+    iframe.title = page.title;
+
+    wrapper.appendChild(iframe);
+    section.appendChild(meta);
+    section.appendChild(wrapper);
+    container.appendChild(section);
+  });
+</script>
+
+</body>
+</html>
