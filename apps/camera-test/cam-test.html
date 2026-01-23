@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Camera Capture</title>
+  <title>Media Capture</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -35,7 +35,18 @@
     .sub {
       color: #475569;
       font-size: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+    }
+
+    .mode {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .mode button.active {
+      background: #2563eb;
+      color: white;
     }
 
     video, canvas {
@@ -62,7 +73,6 @@
       border-radius: 8px;
       font-size: 14px;
       cursor: pointer;
-      transition: opacity 0.2s;
     }
 
     button.secondary {
@@ -83,18 +93,6 @@
       border: 1px solid #e2e8f0;
     }
 
-    .output-block h3 {
-      margin: 0 0 12px 0;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    img, video.recorded {
-      width: 100%;
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-
     .download {
       color: #2563eb;
       font-size: 14px;
@@ -112,15 +110,20 @@
 
 <body>
   <div class="card">
-    <h1>Camera Capture</h1>
-    <p class="sub">Capture high resolution photos and videos using your device camera.</p>
+    <h1>Media Capture</h1>
+    <p class="sub">Video, photo, and audio-only capture using browser Media APIs.</p>
+
+    <div class="mode">
+      <button id="videoMode" class="active">Camera Mode</button>
+      <button id="audioMode">Audio Only</button>
+    </div>
 
     <video id="preview" autoplay playsinline></video>
     <canvas id="photoCanvas" style="display:none;"></canvas>
 
     <div class="toolbar">
-      <button id="startCamera">Start camera</button>
-      <button id="stopCamera" class="secondary" disabled>Stop</button>
+      <button id="start">Start</button>
+      <button id="stop" class="secondary" disabled>Stop</button>
 
       <button id="takePhoto" disabled>Photo</button>
 
@@ -131,76 +134,90 @@
     <div class="status" id="status"></div>
 
     <div class="output-block">
-      <h3>Captured Photo</h3>
+      <h3>Output</h3>
       <img id="photoPreview" style="display:none;" />
-      <a id="downloadPhoto" class="download" href="#" download="photo.png" style="display:none;">Download photo</a>
-    </div>
+      <video id="recordedVideo" controls style="display:none;"></video>
+      <audio id="recordedAudio" controls style="display:none;"></audio>
 
-    <div class="output-block">
-      <h3>Recorded Video</h3>
-      <video id="recordedVideo" class="recorded" controls style="display:none;"></video>
-      <a id="downloadVideo" class="download" href="#" download="video.webm" style="display:none;">Download video</a>
+      <a id="downloadFile" class="download" href="#" style="display:none;">Download</a>
     </div>
   </div>
 
   <script>
-    const startBtn = document.getElementById("startCamera");
-    const stopBtn = document.getElementById("stopCamera");
+    const startBtn = document.getElementById("start");
+    const stopBtn = document.getElementById("stop");
     const photoBtn = document.getElementById("takePhoto");
     const recStartBtn = document.getElementById("startRecording");
     const recStopBtn = document.getElementById("stopRecording");
 
+    const videoModeBtn = document.getElementById("videoMode");
+    const audioModeBtn = document.getElementById("audioMode");
+
     const preview = document.getElementById("preview");
     const canvas = document.getElementById("photoCanvas");
-    const photoPreview = document.getElementById("photoPreview");
-    const downloadPhoto = document.getElementById("downloadPhoto");
 
+    const photoPreview = document.getElementById("photoPreview");
     const recordedVideo = document.getElementById("recordedVideo");
-    const downloadVideo = document.getElementById("downloadVideo");
+    const recordedAudio = document.getElementById("recordedAudio");
+    const downloadFile = document.getElementById("downloadFile");
 
     const statusEl = document.getElementById("status");
 
     let stream = null;
     let mediaRecorder = null;
     let chunks = [];
+    let mode = "video"; // video | audio
 
     function setStatus(msg) {
       statusEl.textContent = msg;
     }
 
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-          audio: true
-        });
+    function setMode(m) {
+      mode = m;
+      videoModeBtn.classList.toggle("active", m === "video");
+      audioModeBtn.classList.toggle("active", m === "audio");
 
-        preview.srcObject = stream;
+      preview.style.display = m === "video" ? "block" : "none";
+      photoBtn.style.display = m === "video" ? "inline-block" : "none";
+    }
+
+    async function start() {
+      try {
+        if (mode === "video") {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: true
+          });
+          preview.srcObject = stream;
+          photoBtn.disabled = false;
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: false
+          });
+        }
 
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        photoBtn.disabled = false;
         recStartBtn.disabled = false;
 
-        setStatus("Camera ready.");
-      } catch (err) {
-        setStatus("Camera access blocked.");
+        setStatus(mode === "video" ? "Camera ready." : "Microphone ready.");
+      } catch (e) {
+        setStatus("Media access blocked.");
       }
     }
 
-    function stopCamera() {
-      if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        preview.srcObject = null;
-      }
+    function stop() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      preview.srcObject = null;
 
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      photoBtn.disabled = true;
       recStartBtn.disabled = true;
       recStopBtn.disabled = true;
+      photoBtn.disabled = true;
 
-      setStatus("Camera stopped.");
+      setStatus("Stopped.");
     }
 
     function takePhoto() {
@@ -217,8 +234,11 @@
         const url = URL.createObjectURL(blob);
         photoPreview.src = url;
         photoPreview.style.display = "block";
-        downloadPhoto.href = url;
-        downloadPhoto.style.display = "inline-block";
+
+        downloadFile.href = url;
+        downloadFile.download = "photo.png";
+        downloadFile.textContent = "Download photo";
+        downloadFile.style.display = "inline-block";
       });
 
       setStatus("Photo captured.");
@@ -226,16 +246,31 @@
 
     function startRecording() {
       chunks = [];
-      mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
 
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      const mime = mode === "video" ? "video/webm" : "audio/webm";
+      mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+
+      mediaRecorder.ondataavailable = e => e.data.size && chunks.push(e.data);
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
+        const blob = new Blob(chunks, { type: mime });
         const url = URL.createObjectURL(blob);
-        recordedVideo.src = url;
-        recordedVideo.style.display = "block";
-        downloadVideo.href = url;
-        downloadVideo.style.display = "inline-block";
+
+        if (mode === "video") {
+          recordedVideo.src = url;
+          recordedVideo.style.display = "block";
+          recordedAudio.style.display = "none";
+          downloadFile.download = "video.webm";
+        } else {
+          recordedAudio.src = url;
+          recordedAudio.style.display = "block";
+          recordedVideo.style.display = "none";
+          downloadFile.download = "audio.webm";
+        }
+
+        downloadFile.href = url;
+        downloadFile.textContent = "Download recording";
+        downloadFile.style.display = "inline-block";
+
         setStatus("Recording saved.");
       };
 
@@ -252,11 +287,14 @@
       recStopBtn.disabled = true;
     }
 
-    startBtn.addEventListener("click", startCamera);
-    stopBtn.addEventListener("click", stopCamera);
-    photoBtn.addEventListener("click", takePhoto);
-    recStartBtn.addEventListener("click", startRecording);
-    recStopBtn.addEventListener("click", stopRecording);
+    videoModeBtn.onclick = () => setMode("video");
+    audioModeBtn.onclick = () => setMode("audio");
+
+    startBtn.onclick = start;
+    stopBtn.onclick = stop;
+    photoBtn.onclick = takePhoto;
+    recStartBtn.onclick = startRecording;
+    recStopBtn.onclick = stopRecording;
   </script>
 </body>
 </html>
