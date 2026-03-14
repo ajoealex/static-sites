@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Modes</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tile {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f32 100%);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tile:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tile-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .tile-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tile-description {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+        }
+
+        .tile.html5 { border-top: 4px solid #e34c26; }
+        .tile.mouse { border-top: 4px solid #4a90d9; }
+        .tile.touch { border-top: 4px solid #34c759; }
+        .tile.pointer { border-top: 4px solid #af52de; }
+    </style>
+</head>
+<body>
+    <h1>Drag and Drop Modes</h1>
+
+    <div class="tiles-container">
+        <a href="https://ajoealex.github.io/static-sites/apps/drag-and-drop/modes/html5_drag_and_drop.html" class="tile html5">
+            <div class="tile-icon">🌐</div>
+            <div class="tile-title">HTML5 Drag & Drop</div>
+            <div class="tile-description">Native browser drag and drop API with dataTransfer</div>
+        </a>
+
+        <a href="https://ajoealex.github.io/static-sites/apps/drag-and-drop/modes/mouse_drag_and_drop.html" class="tile mouse">
+            <div class="tile-icon">🖱️</div>
+            <div class="tile-title">Mouse Drag & Drop</div>
+            <div class="tile-description">Traditional mouse events (mousedown, mousemove, mouseup)</div>
+        </a>
+
+        <a href="https://ajoealex.github.io/static-sites/apps/drag-and-drop/modes/touch_drag_and_drop.html" class="tile touch">
+            <div class="tile-icon">👆</div>
+            <div class="tile-title">Touch Drag & Drop</div>
+            <div class="tile-description">Touch events for mobile devices (touchstart, touchmove, touchend)</div>
+        </a>
+
+        <a href="https://ajoealex.github.io/static-sites/apps/drag-and-drop/modes/pointer_drag_and_drop.html" class="tile pointer">
+            <div class="tile-icon">👉</div>
+            <div class="tile-title">Pointer Drag & Drop</div>
+            <div class="tile-description">Unified pointer events API for all input types</div>
+        </a>
+    </div>
+</body>
+</html>

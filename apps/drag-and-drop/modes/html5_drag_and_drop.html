@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Shift Roster -HTML5 Drag and Drop </title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Segoe UI,Roboto,Arial;
+    background:#f5f7fb;
+}
+
+header{
+    padding:20px;
+    text-align:center;
+    background:#1e293b;
+    color:white;
+    font-size:24px;
+    font-weight:600;
+}
+
+.container{
+    display:flex;
+    height:calc(100vh - 80px);
+}
+
+/* LEFT PANEL */
+
+.employee-panel{
+    width:260px;
+    background:white;
+    padding:20px;
+    border-right:1px solid #e2e8f0;
+    overflow:auto;
+}
+
+.employee-panel h2{
+    margin-top:0;
+    font-size:18px;
+    color:#334155;
+}
+
+.employee{
+    padding:10px 12px;
+    background:#e2e8f0;
+    margin-bottom:8px;
+    border-radius:6px;
+    cursor:grab;
+    font-size:14px;
+    transition:0.2s;
+}
+
+.employee:hover{
+    background:#cbd5f5;
+    transform:scale(1.02);
+}
+
+/* RIGHT PANEL */
+
+.shift-panel{
+    flex:1;
+    display:flex;
+    gap:20px;
+    padding:20px;
+}
+
+.shift{
+    flex:1;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06);
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+}
+
+.shift h3{
+    margin-top:0;
+    text-align:center;
+    padding:10px;
+    border-radius:6px;
+    color:white;
+    font-size:16px;
+}
+
+/* SHIFT COLORS */
+
+.morning h3{ background:#f59e0b;}
+.afternoon h3{ background:#3b82f6;}
+.evening h3{ background:#8b5cf6;}
+.night h3{ background:#0f172a;}
+
+.shift-body{
+    flex:1;
+    padding:10px;
+    min-height:200px;
+}
+
+.shift-body .employee{
+    background:#f1f5f9;
+}
+
+.drag-over{
+    background:#dbeafe;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>Employee Shift Roster</header>
+
+<div class="container">
+
+<div class="employee-panel">
+<h2>Employees</h2>
+
+<div class="employee" draggable="true">Employee 1</div>
+<div class="employee" draggable="true">Employee 2</div>
+<div class="employee" draggable="true">Employee 3</div>
+<div class="employee" draggable="true">Employee 4</div>
+<div class="employee" draggable="true">Employee 5</div>
+<div class="employee" draggable="true">Employee 6</div>
+<div class="employee" draggable="true">Employee 7</div>
+<div class="employee" draggable="true">Employee 8</div>
+<div class="employee" draggable="true">Employee 9</div>
+<div class="employee" draggable="true">Employee 10</div>
+<div class="employee" draggable="true">Employee 11</div>
+<div class="employee" draggable="true">Employee 12</div>
+<div class="employee" draggable="true">Employee 13</div>
+<div class="employee" draggable="true">Employee 14</div>
+<div class="employee" draggable="true">Employee 15</div>
+<div class="employee" draggable="true">Employee 16</div>
+<div class="employee" draggable="true">Employee 17</div>
+<div class="employee" draggable="true">Employee 18</div>
+<div class="employee" draggable="true">Employee 19</div>
+<div class="employee" draggable="true">Employee 20</div>
+
+</div>
+
+<div class="shift-panel">
+
+<div class="shift morning">
+<h3>Morning Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift afternoon">
+<h3>Afternoon Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift evening">
+<h3>Evening Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift night">
+<h3>Night Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let dragged;
+
+document.querySelectorAll(".employee").forEach(emp=>{
+    emp.addEventListener("dragstart",e=>{
+        dragged = e.target;
+        setTimeout(()=>e.target.style.display="none",0);
+    });
+
+    emp.addEventListener("dragend",e=>{
+        e.target.style.display="block";
+    });
+});
+
+document.querySelectorAll(".shift-body, .employee-panel").forEach(zone=>{
+
+    zone.addEventListener("dragover",e=>{
+        e.preventDefault();
+        zone.classList.add("drag-over");
+    });
+
+    zone.addEventListener("dragleave",()=>{
+        zone.classList.remove("drag-over");
+    });
+
+    zone.addEventListener("drop",e=>{
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+        zone.appendChild(dragged);
+    });
+
+});
+
+</script>
+
+</body>
+</html>

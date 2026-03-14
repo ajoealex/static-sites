@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Roster - Touch Drag</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI,Roboto,Arial;
+background:#f5f7fb;
+}
+
+header{
+background:#1e293b;
+color:white;
+padding:18px;
+text-align:center;
+font-size:22px;
+}
+
+.container{
+display:flex;
+height:calc(100vh - 70px);
+}
+
+.employee-panel{
+width:260px;
+background:white;
+padding:20px;
+border-right:1px solid #e2e8f0;
+overflow:auto;
+}
+
+.employee{
+padding:10px;
+background:#e2e8f0;
+margin-bottom:8px;
+border-radius:6px;
+user-select:none;
+}
+
+.shift-panel{
+flex:1;
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.shift{
+flex:1;
+background:white;
+border-radius:10px;
+box-shadow:0 6px 20px rgba(0,0,0,0.06);
+padding:15px;
+display:flex;
+flex-direction:column;
+}
+
+.shift h3{
+margin:0;
+text-align:center;
+padding:10px;
+color:white;
+border-radius:6px;
+}
+
+.morning h3{background:#f59e0b;}
+.afternoon h3{background:#3b82f6;}
+.evening h3{background:#8b5cf6;}
+.night h3{background:#0f172a;}
+
+.shift-body{
+flex:1;
+padding:10px;
+min-height:200px;
+}
+
+.shift-body.drag-hover{
+background:#e0f2fe;
+}
+
+.drag-preview{
+position:absolute;
+pointer-events:none;
+background:#3b82f6;
+color:white;
+padding:8px;
+border-radius:6px;
+opacity:0.9;
+z-index:1000;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>Touch Drag Interaction</header>
+
+<div class="container">
+
+<div class="employee-panel" id="employeeList"></div>
+
+<div class="shift-panel">
+
+<div class="shift morning">
+<h3>Morning</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift afternoon">
+<h3>Afternoon</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift evening">
+<h3>Evening</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift night">
+<h3>Night</h3>
+<div class="shift-body"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+let dragged=null
+let preview=null
+
+const list=document.getElementById("employeeList")
+
+for(let i=1;i<=20;i++){
+
+const emp=document.createElement("div")
+emp.className="employee"
+emp.innerText="Employee "+i
+list.appendChild(emp)
+
+}
+
+document.addEventListener("touchstart",e=>{
+
+const t=e.target
+
+if(!t.classList.contains("employee")) return
+
+dragged=t
+
+const touch=e.touches[0]
+
+preview=document.createElement("div")
+preview.className="drag-preview"
+preview.innerText=dragged.innerText
+document.body.appendChild(preview)
+
+movePreview(touch.pageX,touch.pageY)
+
+})
+
+document.addEventListener("touchmove",e=>{
+
+if(!preview) return
+
+const touch=e.touches[0]
+
+movePreview(touch.pageX,touch.pageY)
+
+const el=document.elementFromPoint(touch.clientX,touch.clientY)
+
+document.querySelectorAll(".shift-body").forEach(z=>z.classList.remove("drag-hover"))
+
+const zone=el?.closest(".shift-body")
+
+if(zone) zone.classList.add("drag-hover")
+
+})
+
+document.addEventListener("touchend",e=>{
+
+if(!preview) return
+
+const touch=e.changedTouches[0]
+
+preview.style.display="none"
+
+const el=document.elementFromPoint(touch.clientX,touch.clientY)
+
+preview.style.display="block"
+
+const zone=el?.closest(".shift-body") || el?.closest("#employeeList")
+
+if(zone) zone.appendChild(dragged)
+
+cleanup()
+
+})
+
+function movePreview(x,y){
+
+preview.style.left=(x+10)+"px"
+preview.style.top=(y+10)+"px"
+
+}
+
+function cleanup(){
+
+document.querySelectorAll(".shift-body").forEach(z=>z.classList.remove("drag-hover"))
+
+preview.remove()
+preview=null
+dragged=null
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Shift Roster</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI,Roboto,Arial;
+background:#f5f7fb;
+}
+
+header{
+background:#1e293b;
+color:white;
+padding:18px;
+text-align:center;
+font-size:22px;
+font-weight:600;
+}
+
+.container{
+display:flex;
+height:calc(100vh - 70px);
+}
+
+/* Employee panel */
+
+.employee-panel{
+width:260px;
+background:white;
+padding:20px;
+border-right:1px solid #e2e8f0;
+overflow:auto;
+}
+
+.employee-panel h2{
+margin-top:0;
+}
+
+.employee{
+padding:10px 12px;
+background:#e2e8f0;
+margin-bottom:8px;
+border-radius:6px;
+cursor:grab;
+user-select:none;
+}
+
+.employee:hover{
+background:#cbd5f5;
+}
+
+/* Shift layout */
+
+.shift-panel{
+flex:1;
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.shift{
+flex:1;
+background:white;
+border-radius:10px;
+box-shadow:0 6px 20px rgba(0,0,0,0.06);
+padding:15px;
+display:flex;
+flex-direction:column;
+}
+
+.shift h3{
+margin-top:0;
+text-align:center;
+padding:10px;
+border-radius:6px;
+color:white;
+}
+
+.morning h3{background:#f59e0b;}
+.afternoon h3{background:#3b82f6;}
+.evening h3{background:#8b5cf6;}
+.night h3{background:#0f172a;}
+
+.shift-body{
+flex:1;
+padding:10px;
+min-height:200px;
+transition:background 0.15s;
+}
+
+.shift-body.drag-hover{
+background:#e0f2fe;
+}
+
+.shift-body .employee{
+background:#f1f5f9;
+}
+
+/* Drag preview */
+
+.drag-preview{
+position:absolute;
+pointer-events:none;
+opacity:0.9;
+z-index:1000;
+background:#3b82f6;
+color:white;
+padding:8px 10px;
+border-radius:6px;
+font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>Employee Shift Roster</header>
+
+<div class="container">
+
+<div class="employee-panel" id="employeeList">
+<h2>Employees</h2>
+</div>
+
+<div class="shift-panel">
+
+<div class="shift morning">
+<h3>Morning Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift afternoon">
+<h3>Afternoon Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift evening">
+<h3>Evening Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+<div class="shift night">
+<h3>Night Shift</h3>
+<div class="shift-body"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let dragged = null
+let preview = null
+let dragging = false
+
+/* Create employees */
+
+const list = document.getElementById("employeeList")
+
+for(let i=1;i<=20;i++){
+
+const emp=document.createElement("div")
+emp.className="employee"
+emp.innerText="Employee "+i
+
+list.appendChild(emp)
+
+}
+
+/* Drag start */
+
+document.addEventListener("mousedown",e=>{
+
+if(!e.target.classList.contains("employee")) return
+
+dragged=e.target
+dragging=true
+
+preview=document.createElement("div")
+preview.className="drag-preview"
+preview.innerText=dragged.innerText
+
+document.body.appendChild(preview)
+
+movePreview(e.pageX,e.pageY)
+
+document.body.style.userSelect="none"
+
+})
+
+/* Drag move */
+
+document.addEventListener("mousemove",e=>{
+
+if(!dragging) return
+
+movePreview(e.pageX,e.pageY)
+
+/* detect drop zone */
+
+document.querySelectorAll(".shift-body").forEach(z=>{
+z.classList.remove("drag-hover")
+})
+
+const el=document.elementFromPoint(e.clientX,e.clientY)
+
+const zone=el?.closest(".shift-body")
+
+if(zone){
+zone.classList.add("drag-hover")
+}
+
+})
+
+/* Drop */
+
+document.addEventListener("mouseup",e=>{
+
+if(!dragging) return
+
+dragging=false
+
+preview.style.display="none"
+
+const el=document.elementFromPoint(e.clientX,e.clientY)
+
+preview.style.display="block"
+
+const zone=el?.closest(".shift-body") || el?.closest("#employeeList")
+
+if(zone){
+zone.appendChild(dragged)
+}
+
+cleanup()
+
+})
+
+function movePreview(x,y){
+
+preview.style.left=(x+12)+"px"
+preview.style.top=(y+12)+"px"
+
+}
+
+function cleanup(){
+
+document.querySelectorAll(".shift-body").forEach(z=>{
+z.classList.remove("drag-hover")
+})
+
+if(preview){
+preview.remove()
+preview=null
+}
+
+dragged=null
+
+document.body.style.userSelect="auto"
+
+}
+
+</script>
+
+</body>
+</html>
