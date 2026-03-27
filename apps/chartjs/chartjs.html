@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Chart.js Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { margin:0; font-family: Arial; background:#f4f6f9; }
+    .container { max-width:1400px; margin:auto; padding:20px; }
+    h1 { text-align:center; }
+    .grid { display:grid; grid-template-columns: repeat(2,1fr); gap:20px; }
+    .card { background:#fff; padding:16px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.06);} 
+    canvas { width:100% !important; }
+    @media(max-width:768px){ .grid{ grid-template-columns:1fr; }}
+  </style>
+</head>
+<body>
+<div class="container">
+<h1>Analytics Dashboard</h1>
+<div class="grid" id="grid"></div>
+</div>
+
+<script>
+const chartConfigs = [
+  {type:'line', label:'Sales Trend'},
+  {type:'bar', label:'Revenue'},
+  {type:'pie', label:'Category Split'},
+  {type:'doughnut', label:'Market Share'},
+  {type:'radar', label:'Performance'},
+  {type:'polarArea', label:'Region Distribution'},
+  {type:'line', label:'User Growth'},
+  {type:'bar', label:'Orders'},
+  {type:'pie', label:'Device Usage'},
+  {type:'doughnut', label:'Traffic Sources'},
+  {type:'radar', label:'Skills'},
+  {type:'polarArea', label:'Sales Regions'},
+  {type:'line', label:'Conversions'},
+  {type:'bar', label:'Profit'},
+  {type:'pie', label:'Subscriptions'},
+  {type:'doughnut', label:'Churn'},
+  {type:'radar', label:'KPIs'},
+  {type:'polarArea', label:'Channels'},
+  {type:'line', label:'Engagement'},
+  {type:'bar', label:'Sessions'}
+];
+
+const colors = [
+  'rgba(255,99,132,0.6)','rgba(54,162,235,0.6)','rgba(255,206,86,0.6)',
+  'rgba(75,192,192,0.6)','rgba(153,102,255,0.6)','rgba(255,159,64,0.6)'
+];
+
+const grid = document.getElementById('grid');
+
+chartConfigs.forEach((cfg, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const title = document.createElement('h3');
+  title.innerText = cfg.label;
+
+  const desc = document.createElement('p');
+  desc.innerText = 'Sample data visualization for ' + cfg.label;
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'chart' + i;
+
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(canvas);
+  grid.appendChild(card);
+
+  new Chart(canvas, {
+    type: cfg.type,
+    data: {
+      labels: ['A','B','C','D','E','F'],
+      datasets: [{
+        label: cfg.label,
+        data: [12,19,3,5,2,3].map(v => v + Math.random()*10),
+        backgroundColor: colors,
+        borderColor: colors.map(c=>c.replace('0.6','1')),
+        fill: cfg.type === 'line'
+      }]
+    },
+    options: {
+      responsive:true,
+      plugins:{ legend:{ display:true } }
+    }
+  });
+});
+</script>
+</body>
+</html>

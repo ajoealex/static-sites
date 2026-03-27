@@ -12,5 +12,6 @@ const tilesData = [
     { name: "Product Search", link: "https://ajoealex.github.io/static-sites/apps/product-search/index.html" },
     { name: "Location Test", link: "https://ajoealex.github.io/static-sites/apps/location-test/index.html" },
     { name: "Cross Domain Iframe Test", link: "https://ajoealex.github.io/static-sites/apps/cross-domain-iframe-test/index.html" },
-    { name: "Drag and Drop", link: "https://ajoealex.github.io/static-sites/apps/drag-and-drop/drag-and-drop.html" }
+    { name: "Drag and Drop", link: "https://ajoealex.github.io/static-sites/apps/drag-and-drop/drag-and-drop.html" },
+    { name: "Chartjs Example", link: "https://ajoealex.github.io/static-sites/apps/chartjs/chartjs.html" }
 ];
