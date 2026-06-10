@@ -200,19 +200,19 @@ body {
 
 <div class="legend" role="note" aria-label="Scroll level legend">
     <strong>Scroll levels:</strong>
-    <span><span class="badge l1" aria-label="Level 1">L1</span> Page — vertical</span>
-    <span><span class="badge l2" aria-label="Level 2">L2</span> Section container — H + V</span>
-    <span><span class="badge l3" aria-label="Level 3">L3</span> Sub-panels — H + V, independent</span>
-    <span><span class="badge l4" aria-label="Level 4">L4</span> Deep nested — H + V</span>
+    <span aria-label="Level 1: Page, vertical scroll"><span class="badge l1" aria-label="Level 1">L1</span> Page — vertical</span>
+    <span aria-label="Level 2: Section container, horizontal and vertical scroll"><span class="badge l2" aria-label="Level 2">L2</span> Section container — H + V</span>
+    <span aria-label="Level 3: Sub-panels, horizontal and vertical scroll, independent"><span class="badge l3" aria-label="Level 3">L3</span> Sub-panels — H + V, independent</span>
+    <span aria-label="Level 4: Deep nested, horizontal and vertical scroll"><span class="badge l4" aria-label="Level 4">L4</span> Deep nested — H + V</span>
 </div>
 
 <!-- ─── Section 1 ─────────────────────────────────────────── -->
 <div class="section" role="region" aria-label="Section 1">
     <div class="left-panel" aria-label="Section 1 info panel">
-        <h2>Section 1 <span class="badge l1" aria-label="Level 1">L1</span></h2>
-        <p>
+        <h2 aria-label="Section 1">Section 1 <span class="badge l1" aria-label="Level 1">L1</span></h2>
+        <p aria-label="Section 1 description">
             Scroll the page down to reach Section 2.<br><br>
-            Every bordered region scrolls both <strong>horizontally and vertically</strong>.
+            Every bordered region scrolls both <strong aria-label="horizontally and vertically">horizontally and vertically</strong>.
         </p>
     </div>
 
@@ -222,7 +222,7 @@ body {
             <div class="scroll-content" aria-label="Section 1 panel row">
 
                 <div class="sub-panel" role="region" aria-label="Section 1 Panel A, scrollable horizontally and vertically">
-                    <h4>Panel A <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 1 Panel A, Level 3 sub-panel">Panel A <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Scroll me right to see the wide data strip below.</p>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit incididunt.</p>
                     <p>Ut labore et dolore magna aliqua. Ut enim ad minim veniam exercitation.</p>
@@ -239,8 +239,8 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 1 Panel B, scrollable horizontally and vertically">
-                    <h4>Panel B <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
-                    <p>Contains a <strong>Level 4</strong> nested region — also scrolls both axes.</p>
+                    <h4 aria-label="Section 1 Panel B, Level 3 sub-panel">Panel B <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <p aria-label="Section 1 Panel B description">Contains a <strong aria-label="Level 4">Level 4</strong> nested region — also scrolls both axes.</p>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit tempor.</p>
                     <div class="deep-scroll" role="region" aria-label="Section 1 Panel B Level 4 deep scroll region, scrollable horizontally and vertically">
                         <div class="deep-header" aria-label="Level 4 scroll region header">L4 ↔↕ — scroll me both ways</div>
@@ -269,7 +269,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 1 Panel C, scrollable horizontally and vertically">
-                    <h4>Panel C <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 1 Panel C, Level 3 sub-panel">Panel C <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Independent from A and B — scrolling here won't move them.</p>
                     <p>Vestibulum imperdiet magna vel mauris fermentum, nec cursus libero malesuada.</p>
                     <p>Curabitur at ligula vel neque ultrices facilisis praesent malesuada justo.</p>
@@ -286,7 +286,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 1 Panel D, scrollable horizontally and vertically">
-                    <h4>Panel D <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 1 Panel D, Level 3 sub-panel">Panel D <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>L4 deep-scroll sits inside this L3 panel — 4 active scroll layers at once.</p>
                     <div class="deep-scroll" role="region" aria-label="Section 1 Panel D Level 4 deep scroll region, scrollable horizontally and vertically">
                         <div class="deep-header" aria-label="Level 4 scroll region header">L4 ↔↕ — scroll me both ways</div>
@@ -315,7 +315,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 1 Panel E, scrollable horizontally and vertically">
-                    <h4>Panel E <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 1 Panel E, Level 3 sub-panel">Panel E <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Reachable only by scrolling the L2 container rightward.</p>
                     <p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam.</p>
                     <p>Nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas.</p>
@@ -339,9 +339,9 @@ body {
 <!-- ─── Section 2 ─────────────────────────────────────────── -->
 <div class="section" role="region" aria-label="Section 2">
     <div class="left-panel" aria-label="Section 2 info panel">
-        <h2>Section 2 <span class="badge l1" aria-label="Level 1">L1</span></h2>
-        <p>
-            You scrolled the page (L1) to get here.<br><br>
+        <h2 aria-label="Section 2">Section 2 <span class="badge l1" aria-label="Level 1">L1</span></h2>
+        <p aria-label="Section 2 description">
+            You scrolled the page (<strong aria-label="Level 1">L1</strong>) to get here.<br><br>
             All four scroll levels are independent from Section 1.
         </p>
     </div>
@@ -352,7 +352,7 @@ body {
             <div class="scroll-content" aria-label="Section 2 panel row">
 
                 <div class="sub-panel" role="region" aria-label="Section 2 Panel A, scrollable horizontally and vertically">
-                    <h4>Panel A <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 2 Panel A, Level 3 sub-panel">Panel A <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.</p>
                     <p>Doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore.</p>
                     <p>Veritatis et quasi architecto beatae vitae dicta sunt explicabo nemo enim.</p>
@@ -369,7 +369,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 2 Panel B, scrollable horizontally and vertically">
-                    <h4>Panel B <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 2 Panel B, Level 3 sub-panel">Panel B <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Scroll down to reach the L4 region, then scroll it both ways too.</p>
                     <p>Ut enim ad minima veniam quis nostrum exercitationem ullam corporis suscipit.</p>
                     <div class="deep-scroll" role="region" aria-label="Section 2 Panel B Level 4 deep scroll region, scrollable horizontally and vertically">
@@ -397,7 +397,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 2 Panel C, scrollable horizontally and vertically">
-                    <h4>Panel C <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 2 Panel C, Level 3 sub-panel">Panel C <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut.</p>
                     <p>Fugit sed quia consequuntur magni dolores eos qui ratione voluptatem.</p>
                     <p>Sequi nesciunt neque porro quisquam est qui dolorem ipsum quia dolor.</p>
@@ -414,7 +414,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 2 Panel D, scrollable horizontally and vertically">
-                    <h4>Panel D <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 2 Panel D, Level 3 sub-panel">Panel D <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>All four scroll levels active when interacting with the L4 region here.</p>
                     <div class="deep-scroll" role="region" aria-label="Section 2 Panel D Level 4 deep scroll region, scrollable horizontally and vertically">
                         <div class="deep-header" aria-label="Level 4 scroll region header">L4 ↔↕ — scroll me both ways</div>
@@ -442,7 +442,7 @@ body {
                 </div>
 
                 <div class="sub-panel" role="region" aria-label="Section 2 Panel E, scrollable horizontally and vertically">
-                    <h4>Panel E <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
+                    <h4 aria-label="Section 2 Panel E, Level 3 sub-panel">Panel E <span class="badge l3" aria-label="Level 3">L3</span> ↔↕</h4>
                     <p>Final panel of Section 2, reached only by L2 horizontal scroll.</p>
                     <p>Temporibus autem quibusdam et aut officiis debitis rerum necessitatibus.</p>
                     <p>Saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.</p>
