@@ -13,5 +13,6 @@ const tilesData = [
     { name: "Location Test", link: "https://ajoealex.github.io/static-sites/apps/location-test/index.html" },
     { name: "Cross Domain Iframe Test", link: "https://ajoealex.github.io/static-sites/apps/cross-domain-iframe-test/index.html" },
     { name: "Drag and Drop", link: "https://ajoealex.github.io/static-sites/apps/drag-and-drop/drag-and-drop.html" },
-    { name: "Chartjs Example", link: "https://ajoealex.github.io/static-sites/apps/chartjs/chartjs.html" }
+    { name: "Chartjs Example", link: "https://ajoealex.github.io/static-sites/apps/chartjs/chartjs.html" },
+    { name: "scroll test", link: "https://ajoealex.github.io/static-sites/apps/scroll-test/index.html" }
 ];
