@@ -1,0 +1,740 @@
+<!doctype html>
+<html id="tables-demo-root" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three Table Patterns — Live Order Tracking</title>
+<style>
+  :root{
+    --bg: #0f1420;
+    --bg-soft: #141a2a;
+    --panel: #171e30;
+    --panel-2: #1c2438;
+    --border: #2a3350;
+    --text: #e6e9f2;
+    --text-dim: #9aa4bf;
+    --accent: #6ea8fe;
+    --accent-soft: rgba(110,168,254,.12);
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius: 14px;
+
+    --ok-bg: rgba(52, 199, 89, .15);
+    --ok-fg: #4ade80;
+    --info-bg: rgba(94, 156, 255, .15);
+    --info-fg: #6ea8fe;
+    --warn-bg: rgba(255, 176, 32, .15);
+    --warn-fg: #fbbf24;
+    --bad-bg: rgba(255, 82, 82, .15);
+    --bad-fg: #f87171;
+  }
+
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg: #f4f6fb;
+      --bg-soft: #eef1f8;
+      --panel: #ffffff;
+      --panel-2: #f8f9fd;
+      --border: #e2e6f0;
+      --text: #1b2130;
+      --text-dim: #667089;
+      --accent: #2f6fed;
+      --accent-soft: rgba(47,111,237,.08);
+      --shadow: 0 10px 30px rgba(30,40,70,.08);
+
+      --ok-bg: rgba(22, 163, 74, .1);
+      --ok-fg: #15803d;
+      --info-bg: rgba(37, 99, 235, .1);
+      --info-fg: #1d4ed8;
+      --warn-bg: rgba(217, 119, 6, .12);
+      --warn-fg: #b45309;
+      --bad-bg: rgba(220, 38, 38, .1);
+      --bad-fg: #b91c1c;
+    }
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    padding: 48px 8px 96px;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, var(--accent-soft), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, "Inter", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap{ max-width: 100%; margin: 0; }
+
+  header.page{ margin-bottom: 48px; text-align: center; }
+  header.page h1{
+    font-size: 1.9rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  header.page p{
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.98rem;
+  }
+
+  section.block{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 36px;
+  }
+
+  section.block h2{
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section.block h2 .tag{
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  section.block p.desc{
+    margin: 0 0 22px;
+    color: var(--text-dim);
+    font-size: .9rem;
+  }
+  section.block p.desc code{
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: .85em;
+  }
+
+  .scroll{ overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+
+  /* ---------- status pill (shared) ---------- */
+  .status{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .status::before{
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .status.ok{ background: var(--ok-bg); color: var(--ok-fg); }
+  .status.info{ background: var(--info-bg); color: var(--info-fg); }
+  .status.warn{ background: var(--warn-bg); color: var(--warn-fg); }
+  .status.bad{ background: var(--bad-bg); color: var(--bad-fg); }
+
+  .amount{ font-variant-numeric: tabular-nums; font-weight: 600; }
+  .muted{ color: var(--text-dim); font-size: .85em; }
+
+  /* =========================================================
+     1) NATIVE HTML5 TABLE
+     ========================================================= */
+  table.orders{
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+    background: var(--panel);
+  }
+  table.orders caption{ display:none; }
+  table.orders > thead > tr > th{
+    position: sticky;
+    top: 0;
+    background: var(--panel-2);
+    text-align: left;
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.orders > tbody > tr > td{
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+    vertical-align: middle;
+  }
+  table.orders > tbody > tr:last-child > td{ border-bottom: none; }
+  table.orders > tbody > tr{ transition: background .15s ease; }
+  table.orders > tbody > tr:nth-child(even){ background: var(--bg-soft); }
+  table.orders > tbody > tr:hover{ background: var(--accent-soft); }
+  table.orders > tbody > tr > td.id, table.orders > tbody > tr > td.time{ color: var(--text-dim); font-size: .85rem; }
+
+  /* =========================================================
+     2) DIV TABLE — ROW-MAJOR
+     Parent = row (flex-direction: row), children = cells
+     ========================================================= */
+  .dtable{
+    display: flex;
+    flex-direction: column;
+    min-width: 720px;
+    background: var(--panel);
+  }
+  .dtable .drow{
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid var(--border);
+  }
+  .dtable .drow:last-child{ border-bottom: none; }
+  .dtable .drow.head{
+    background: var(--panel-2);
+    position: sticky;
+    top: 0;
+  }
+  .dtable .drow.head .dcell{
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+  .dtable .drow:nth-child(even):not(.head){ background: var(--bg-soft); }
+  .dtable .drow:not(.head):hover{ background: var(--accent-soft); }
+  .dtable .dcell{
+    flex: 1 1 0;
+    padding: 13px 16px;
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .dtable .dcell.narrow{ flex: 0 0 110px; }
+  .dtable .dcell.wide{ flex: 1.6 1 0; }
+  .dtable .dcell.dim{ color: var(--text-dim); font-size: .85rem; }
+
+  /* =========================================================
+     3) DIV TABLE — COLUMN-MAJOR
+     Parent = column (flex-direction: column), children = cells
+     The outer container lays the column-parents out side by side.
+     ========================================================= */
+  .ctable{
+    display: flex;
+    flex-direction: row;
+    min-width: 720px;
+    background: var(--panel);
+  }
+  .ctable .dcol{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
+    border-right: 1px solid var(--border);
+  }
+  .ctable .dcol:last-child{ border-right: none; }
+  .ctable .dcol.narrow{ flex: 0 0 110px; }
+  .ctable .dcol.wide{ flex: 1.6 1 0; }
+
+  .ctable .dcol .ccell{
+    padding: 13px 16px;
+    font-size: .9rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    height: 46px;
+    max-height: 46px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .ctable .dcol .ccell:last-child{ border-bottom: none; }
+  .ctable .dcol .ccell.head{
+    background: var(--panel-2);
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-dim);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  .ctable .dcol .ccell.dim{ color: var(--text-dim); font-size: .85rem; }
+  /* zebra stripe applied per data-row-index via nth-of-type on cells, offset by 1 for the head */
+  .ctable .dcol .ccell:nth-of-type(even):not(.head){ background: var(--bg-soft); }
+
+  /* =========================================================
+     4) NESTED HTML5 TABLE — dynamic depth
+     ========================================================= */
+  .controls{
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .controls .field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .controls label{
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+  .controls input[type="number"]{
+    width: 110px;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: .95rem;
+    font-family: inherit;
+  }
+  .controls input[type="number"]:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  table.nested-table{
+    border-collapse: collapse;
+    background: var(--bg-soft);
+  }
+  table.nested-table td{
+    vertical-align: top;
+  }
+  table.nested-table .nested-cell-label{
+    display: inline-block;
+    margin: 4px;
+    padding: 6px 9px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: .72rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  table.nested-table[data-depth="1"]{ background: rgba(110,168,254,.05); }
+  table.nested-table[data-depth="2"]{ background: rgba(74,222,128,.05); }
+  table.nested-table[data-depth="3"]{ background: rgba(251,191,36,.05); }
+  table.nested-table[data-depth="4"]{ background: rgba(248,113,113,.05); }
+  table.nested-table[data-depth="5"]{ background: rgba(192,132,252,.06); }
+  table.nested-table[data-depth="6"]{ background: rgba(45,212,191,.06); }
+
+  footer.note{
+    text-align: center;
+    color: var(--text-dim);
+    font-size: .82rem;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body id="tables-demo-body">
+<div id="tables-demo-wrap" class="wrap">
+
+  <header class="page">
+    <h1>Live Order Tracking — Three Table Patterns</h1>
+    <p>The same realtime order feed, rendered three different ways: a native HTML5 table, a div-based table grouped by row, and a div-based table grouped by column.</p>
+  </header>
+
+  <!-- =========================================================
+       1) NATIVE HTML5 TABLE
+       ========================================================= -->
+  <section id="html5-table-section" class="block">
+    <h2>1. Native HTML5 Table <span class="tag">table / thead / tbody</span></h2>
+    <p class="desc">Realistic e-commerce order feed: <code>&lt;table&gt;</code> with semantic <code>&lt;th&gt;</code>/<code>&lt;td&gt;</code>, sticky header, and zebra rows.</p>
+
+    <div class="scroll">
+      <table id="html5-table-root" class="orders">
+        <caption>Live order feed</caption>
+        <thead>
+          <tr>
+            <th scope="col">Order ID</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Product</th>
+            <th scope="col">Status</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id">#ORD-10492</td>
+            <td>Maria Chen</td>
+            <td>Wireless Mouse — Slate</td>
+            <td><span class="status ok">Delivered</span></td>
+            <td class="amount">$24.99</td>
+            <td class="time">2 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10493</td>
+            <td>Daniel Okafor</td>
+            <td>27" 4K Monitor</td>
+            <td><span class="status info">Shipped</span></td>
+            <td class="amount">$389.00</td>
+            <td class="time">6 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10494</td>
+            <td>Priya Raman</td>
+            <td>Mechanical Keyboard TKL</td>
+            <td><span class="status warn">Processing</span></td>
+            <td class="amount">$112.50</td>
+            <td class="time">9 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10495</td>
+            <td>Liam O'Sullivan</td>
+            <td>USB-C Docking Station</td>
+            <td><span class="status bad">Cancelled</span></td>
+            <td class="amount">$76.20</td>
+            <td class="time">14 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10496</td>
+            <td>Sofia Ricci</td>
+            <td>Noise Cancelling Headphones</td>
+            <td><span class="status ok">Delivered</span></td>
+            <td class="amount">$199.99</td>
+            <td class="time">21 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10497</td>
+            <td>Kenji Watanabe</td>
+            <td>Laptop Stand — Aluminum</td>
+            <td><span class="status info">Shipped</span></td>
+            <td class="amount">$45.00</td>
+            <td class="time">27 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10498</td>
+            <td>Amara Nwosu</td>
+            <td>Portable SSD 1TB</td>
+            <td><span class="status warn">Processing</span></td>
+            <td class="amount">$94.75</td>
+            <td class="time">33 min ago</td>
+          </tr>
+          <tr>
+            <td class="id">#ORD-10499</td>
+            <td>Tom Bergström</td>
+            <td>Webcam 1080p</td>
+            <td><span class="status ok">Delivered</span></td>
+            <td class="amount">$58.30</td>
+            <td class="time">41 min ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       2) DIV TABLE — ROW MAJOR (parent = row, flex-direction: row)
+       ========================================================= -->
+  <section id="row-div-table-section" class="block">
+    <h2>2. Div Table — Row Layout <span class="tag">parent = row</span></h2>
+    <p class="desc">Each row is a parent <code>&lt;div class="drow"&gt;</code> with <code>flex-direction: row</code>; the cells are its direct children laid out horizontally.</p>
+
+    <div class="scroll">
+      <div id="row-div-table-root" class="dtable" role="table" aria-label="Live order feed, row layout">
+
+        <div class="drow head" role="row">
+          <div class="dcell narrow" role="columnheader">Order ID</div>
+          <div class="dcell" role="columnheader">Customer</div>
+          <div class="dcell wide" role="columnheader">Product</div>
+          <div class="dcell" role="columnheader">Status</div>
+          <div class="dcell narrow" role="columnheader">Amount</div>
+          <div class="dcell narrow" role="columnheader">Updated</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10492</div>
+          <div class="dcell" role="cell">Maria Chen</div>
+          <div class="dcell wide" role="cell">Wireless Mouse — Slate</div>
+          <div class="dcell" role="cell"><span class="status ok">Delivered</span></div>
+          <div class="dcell narrow amount" role="cell">$24.99</div>
+          <div class="dcell narrow dim" role="cell">2 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10493</div>
+          <div class="dcell" role="cell">Daniel Okafor</div>
+          <div class="dcell wide" role="cell">27" 4K Monitor</div>
+          <div class="dcell" role="cell"><span class="status info">Shipped</span></div>
+          <div class="dcell narrow amount" role="cell">$389.00</div>
+          <div class="dcell narrow dim" role="cell">6 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10494</div>
+          <div class="dcell" role="cell">Priya Raman</div>
+          <div class="dcell wide" role="cell">Mechanical Keyboard TKL</div>
+          <div class="dcell" role="cell"><span class="status warn">Processing</span></div>
+          <div class="dcell narrow amount" role="cell">$112.50</div>
+          <div class="dcell narrow dim" role="cell">9 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10495</div>
+          <div class="dcell" role="cell">Liam O'Sullivan</div>
+          <div class="dcell wide" role="cell">USB-C Docking Station</div>
+          <div class="dcell" role="cell"><span class="status bad">Cancelled</span></div>
+          <div class="dcell narrow amount" role="cell">$76.20</div>
+          <div class="dcell narrow dim" role="cell">14 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10496</div>
+          <div class="dcell" role="cell">Sofia Ricci</div>
+          <div class="dcell wide" role="cell">Noise Cancelling Headphones</div>
+          <div class="dcell" role="cell"><span class="status ok">Delivered</span></div>
+          <div class="dcell narrow amount" role="cell">$199.99</div>
+          <div class="dcell narrow dim" role="cell">21 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10497</div>
+          <div class="dcell" role="cell">Kenji Watanabe</div>
+          <div class="dcell wide" role="cell">Laptop Stand — Aluminum</div>
+          <div class="dcell" role="cell"><span class="status info">Shipped</span></div>
+          <div class="dcell narrow amount" role="cell">$45.00</div>
+          <div class="dcell narrow dim" role="cell">27 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10498</div>
+          <div class="dcell" role="cell">Amara Nwosu</div>
+          <div class="dcell wide" role="cell">Portable SSD 1TB</div>
+          <div class="dcell" role="cell"><span class="status warn">Processing</span></div>
+          <div class="dcell narrow amount" role="cell">$94.75</div>
+          <div class="dcell narrow dim" role="cell">33 min ago</div>
+        </div>
+
+        <div class="drow" role="row">
+          <div class="dcell narrow dim" role="cell">#ORD-10499</div>
+          <div class="dcell" role="cell">Tom Bergström</div>
+          <div class="dcell wide" role="cell">Webcam 1080p</div>
+          <div class="dcell" role="cell"><span class="status ok">Delivered</span></div>
+          <div class="dcell narrow amount" role="cell">$58.30</div>
+          <div class="dcell narrow dim" role="cell">41 min ago</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       3) DIV TABLE — COLUMN MAJOR (parent = column, flex-direction: column)
+       ========================================================= -->
+  <section id="column-div-table-section" class="block">
+    <h2>3. Div Table — Column Layout <span class="tag">parent = column</span></h2>
+    <p class="desc">Each column is a parent <code>&lt;div class="dcol"&gt;</code> with <code>flex-direction: column</code>; the cells for that field are its direct children, stacked vertically. The outer container places the column-parents side by side.</p>
+
+    <div class="scroll">
+      <div id="column-div-table-root" class="ctable" role="table" aria-label="Live order feed, column layout">
+
+        <div id="col-order-id" class="dcol narrow" role="rowgroup">
+          <div class="ccell head" role="columnheader">Order ID</div>
+          <div class="ccell dim" role="cell">#ORD-10492</div>
+          <div class="ccell dim" role="cell">#ORD-10493</div>
+          <div class="ccell dim" role="cell">#ORD-10494</div>
+          <div class="ccell dim" role="cell">#ORD-10495</div>
+          <div class="ccell dim" role="cell">#ORD-10496</div>
+          <div class="ccell dim" role="cell">#ORD-10497</div>
+          <div class="ccell dim" role="cell">#ORD-10498</div>
+          <div class="ccell dim" role="cell">#ORD-10499</div>
+        </div>
+
+        <div id="col-customer" class="dcol" role="rowgroup">
+          <div class="ccell head" role="columnheader">Customer</div>
+          <div class="ccell" role="cell">Maria Chen</div>
+          <div class="ccell" role="cell">Daniel Okafor</div>
+          <div class="ccell" role="cell">Priya Raman</div>
+          <div class="ccell" role="cell">Liam O'Sullivan</div>
+          <div class="ccell" role="cell">Sofia Ricci</div>
+          <div class="ccell" role="cell">Kenji Watanabe</div>
+          <div class="ccell" role="cell">Amara Nwosu</div>
+          <div class="ccell" role="cell">Tom Bergström</div>
+        </div>
+
+        <div id="col-product" class="dcol wide" role="rowgroup">
+          <div class="ccell head" role="columnheader">Product</div>
+          <div class="ccell" role="cell">Wireless Mouse — Slate</div>
+          <div class="ccell" role="cell">27" 4K Monitor</div>
+          <div class="ccell" role="cell">Mechanical Keyboard TKL</div>
+          <div class="ccell" role="cell">USB-C Docking Station</div>
+          <div class="ccell" role="cell">Noise Cancelling Headphones</div>
+          <div class="ccell" role="cell">Laptop Stand — Aluminum</div>
+          <div class="ccell" role="cell">Portable SSD 1TB</div>
+          <div class="ccell" role="cell">Webcam 1080p</div>
+        </div>
+
+        <div id="col-status" class="dcol" role="rowgroup">
+          <div class="ccell head" role="columnheader">Status</div>
+          <div class="ccell" role="cell"><span class="status ok">Delivered</span></div>
+          <div class="ccell" role="cell"><span class="status info">Shipped</span></div>
+          <div class="ccell" role="cell"><span class="status warn">Processing</span></div>
+          <div class="ccell" role="cell"><span class="status bad">Cancelled</span></div>
+          <div class="ccell" role="cell"><span class="status ok">Delivered</span></div>
+          <div class="ccell" role="cell"><span class="status info">Shipped</span></div>
+          <div class="ccell" role="cell"><span class="status warn">Processing</span></div>
+          <div class="ccell" role="cell"><span class="status ok">Delivered</span></div>
+        </div>
+
+        <div id="col-amount" class="dcol narrow" role="rowgroup">
+          <div class="ccell head" role="columnheader">Amount</div>
+          <div class="ccell amount" role="cell">$24.99</div>
+          <div class="ccell amount" role="cell">$389.00</div>
+          <div class="ccell amount" role="cell">$112.50</div>
+          <div class="ccell amount" role="cell">$76.20</div>
+          <div class="ccell amount" role="cell">$199.99</div>
+          <div class="ccell amount" role="cell">$45.00</div>
+          <div class="ccell amount" role="cell">$94.75</div>
+          <div class="ccell amount" role="cell">$58.30</div>
+        </div>
+
+        <div id="col-updated" class="dcol narrow" role="rowgroup">
+          <div class="ccell head" role="columnheader">Updated</div>
+          <div class="ccell dim" role="cell">2 min ago</div>
+          <div class="ccell dim" role="cell">6 min ago</div>
+          <div class="ccell dim" role="cell">9 min ago</div>
+          <div class="ccell dim" role="cell">14 min ago</div>
+          <div class="ccell dim" role="cell">21 min ago</div>
+          <div class="ccell dim" role="cell">27 min ago</div>
+          <div class="ccell dim" role="cell">33 min ago</div>
+          <div class="ccell dim" role="cell">41 min ago</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       4) NESTED HTML5 TABLE — dynamic depth
+       ========================================================= -->
+  <section id="nested-table-section" class="block">
+    <h2>4. Nested HTML5 Table <span class="tag">dynamic depth</span></h2>
+    <p class="desc">
+      Root table: 10 rows. Column 1 holds a plain value; every column after that nests one more table
+      inside the previous column's last cell, so nesting depth grows with the column index. Every nested
+      table — at any depth — keeps the same cell count per row, e.g. <code>&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;</code>.
+    </p>
+
+    <div class="controls">
+      <div class="field">
+        <label for="root-columns-input">Root columns</label>
+        <input id="root-columns-input" type="number" min="1" max="8" value="3">
+      </div>
+      <div class="field">
+        <label for="nested-cells-input">Cells per row (nested)</label>
+        <input id="nested-cells-input" type="number" min="1" max="6" value="2">
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div id="nested-table-root"></div>
+    </div>
+  </section>
+
+  <footer class="note">Same dataset, three markup strategies — scroll horizontally on narrow screens.</footer>
+
+</div>
+
+<script>
+(function(){
+  var ROWS = 10;
+  var rootColumnsInput = document.getElementById('root-columns-input');
+  var cellsPerRowInput = document.getElementById('nested-cells-input');
+  var mount = document.getElementById('nested-table-root');
+
+  function clamp(value, min, max){
+    var n = parseInt(value, 10);
+    if (isNaN(n)) return min;
+    return Math.min(max, Math.max(min, n));
+  }
+
+  // Builds one nested table; if depthRemaining > 0, the last cell of its
+  // single row recurses into another nested table one level deeper.
+  function buildNestedTable(depthRemaining, cellsPerRow, depthIndex){
+    var table = document.createElement('table');
+    table.className = 'nested-table';
+    table.id = 'nested-table-depth-' + depthIndex + '-' + Math.random().toString(36).slice(2, 8);
+    table.dataset.depth = depthIndex;
+
+    var tbody = document.createElement('tbody');
+    var tr = document.createElement('tr');
+
+    for (var c = 0; c < cellsPerRow; c++){
+      var td = document.createElement('td');
+      var isLast = c === cellsPerRow - 1;
+      if (isLast && depthRemaining > 0){
+        td.appendChild(buildNestedTable(depthRemaining - 1, cellsPerRow, depthIndex + 1));
+      } else {
+        var label = document.createElement('span');
+        label.className = 'nested-cell-label';
+        label.textContent = 'd' + depthIndex + 'c' + (c + 1);
+        td.appendChild(label);
+      }
+      tr.appendChild(td);
+    }
+
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+    return table;
+  }
+
+  function buildRootTable(cols, cellsPerRow){
+    var table = document.createElement('table');
+    table.id = 'nested-html-root-table';
+    table.className = 'orders';
+
+    var thead = document.createElement('thead');
+    var headRow = document.createElement('tr');
+    for (var c = 0; c < cols; c++){
+      var th = document.createElement('th');
+      th.textContent = c === 0 ? 'Column 1' : 'Column ' + (c + 1) + ' — depth ' + c;
+      headRow.appendChild(th);
+    }
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    for (var r = 0; r < ROWS; r++){
+      var tr = document.createElement('tr');
+      for (var col = 0; col < cols; col++){
+        var td = document.createElement('td');
+        if (col === 0){
+          td.textContent = 'Row ' + (r + 1);
+        } else {
+          td.appendChild(buildNestedTable(col - 1, cellsPerRow, 1));
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    return table;
+  }
+
+  function render(){
+    var cols = clamp(rootColumnsInput.value, 1, 8);
+    var cellsPerRow = clamp(cellsPerRowInput.value, 1, 6);
+    mount.innerHTML = '';
+    mount.appendChild(buildRootTable(cols, cellsPerRow));
+  }
+
+  rootColumnsInput.addEventListener('input', render);
+  cellsPerRowInput.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>
