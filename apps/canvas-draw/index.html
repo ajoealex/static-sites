@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas Drawing</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f4f1;color:#20392e;font:14px system-ui,sans-serif}canvas{display:block;background:#fff;touch-action:none;cursor:crosshair}#selector{position:fixed;inset:0;touch-action:none;cursor:crosshair;background-color:#f4f6f3;background-image:radial-gradient(#cbd5cc 1px,transparent 1px);background-size:20px 20px}#rectangle{position:absolute;border:2px solid #2b7256;background:#2b72561a;pointer-events:none;display:none}#sizeTag{position:absolute;bottom:8px;left:8px;background:#244f40;color:white;padding:5px 9px;border-radius:5px;white-space:nowrap}.panel{position:fixed;z-index:2;top:20px;left:20px;right:20px;max-width:670px;margin:auto;padding:20px;background:#fffffff5;border:1px solid #d6e0d8;border-radius:14px;box-shadow:0 8px 32px #20392e15;cursor:default}h1{font-size:22px;letter-spacing:-.03em;margin:0 0 6px}p{margin:0 0 16px;color:#617269;font-size:13px}.controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap}label{display:grid;gap:5px;font-size:12px;flex:1;min-width:100px}input{width:100%;font:14px system-ui;padding:10px;border:1px solid #bccbc1;border-radius:7px}button{font:600 13px system-ui;padding:11px 18px;border:0;border-radius:7px;background:#244f40;color:white;cursor:pointer}button.secondary{background:#e8eee9;color:#244f40}button:focus-visible,input:focus-visible{outline:3px solid #93bda5;outline-offset:2px}#error{color:#a62929;margin-top:10px;font-size:12px}#drawingTools{position:fixed;z-index:3;right:16px;bottom:16px;display:flex;gap:8px;align-items:center;padding:8px;background:#fffffff0;border:1px solid #d6e0d8;border-radius:10px}#dimensions{font-size:12px;margin:0 6px} [hidden]{display:none!important}#status{position:fixed;left:16px;bottom:16px;font-size:12px;color:#53685b;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="canvas" hidden aria-label="Freehand drawing canvas"></canvas>
+<div id="selector" aria-label="Drag to select canvas dimensions"><div id="rectangle"><span id="sizeTag"></span></div></div>
+<form id="settings" class="panel">
+<h1>Set your canvas</h1><p>Drag a rectangle anywhere outside this panel, or enter dimensions in pixels. Use <b>full</b> for the full viewport width or height.</p>
+<div class="controls"><label>Width<input id="width" value="full" aria-label="Canvas width" autocomplete="off"></label><label>Height<input id="height" value="full" aria-label="Canvas height" autocomplete="off"></label><button type="button" id="full" class="secondary">Full page</button><button type="submit">Set</button></div><div id="error" role="alert"></div>
+</form>
+<div id="drawingTools" hidden><span id="dimensions"></span><button id="resize" class="secondary">Resize</button><button id="clear">Clear</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+const $=id=>document.getElementById(id);
+const canvas=$('canvas'),ctx=canvas.getContext('2d'),selector=$('selector'),rect=$('rectangle');
+let mode='select',selectedPointer=null,origin=null,drawingPointer=null,active=null,strokes=[],widthValue='full',heightValue='full';
+function parseDimension(value){const v=value.trim().toLowerCase();return v==='full'?'full':/^[1-9]\d*$/.test(v)&&Number.isSafeInteger(Number(v))?Number(v):null;}
+function dimensions(){return {w:widthValue==='full'?window.innerWidth:widthValue,h:heightValue==='full'?window.innerHeight:heightValue};}
+function render(){const {w,h}=dimensions();canvas.style.width=w+'px';canvas.style.height=h+'px';const dpr=window.devicePixelRatio||1;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.strokeStyle=ctx.fillStyle='#244f40';ctx.lineWidth=3;ctx.lineCap=ctx.lineJoin='round';for(const stroke of strokes){ctx.beginPath();if(stroke.length===1){ctx.arc(stroke[0].x,stroke[0].y,1.5,0,Math.PI*2);ctx.fill();}else{stroke.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](p.x,p.y));ctx.stroke();}}$('dimensions').textContent=w+' × '+h+' px';}
+function apply(w,h){widthValue=w;heightValue=h;mode='draw';active=null;drawingPointer=null;selector.hidden=true;$('settings').hidden=true;canvas.hidden=false;$('drawingTools').hidden=false;$('status').textContent='Drag to draw';render();}
+function loadURL(){const params=new URLSearchParams(location.search);const w=parseDimension(params.get('width')||'full'),h=parseDimension(params.get('height')||'full');$('width').value=w??'full';$('height').value=h??'full';if(params.has('width')&&params.has('height')&&w!==null&&h!==null)apply(w,h);else openSettings();}
+function openSettings(){mode='select';selectedPointer=null;origin=null;drawingPointer=null;active=null;selector.hidden=false;$('settings').hidden=false;$('drawingTools').hidden=true;rect.style.display='none';$('status').textContent='Drag to select a rectangle';}
+selector.addEventListener('pointerdown',e=>{if(e.button!==0||selectedPointer!==null)return;selectedPointer=e.pointerId;selector.setPointerCapture(e.pointerId);origin={x:e.clientX,y:e.clientY};rect.style.display='none';});
+function selectMove(e){if(e.pointerId!==selectedPointer)return;const x=Math.max(0,Math.min(innerWidth,e.clientX)),y=Math.max(0,Math.min(innerHeight,e.clientY));const w=Math.max(1,Math.round(Math.abs(x-origin.x))),h=Math.max(1,Math.round(Math.abs(y-origin.y)));Object.assign(rect.style,{display:'block',left:Math.min(x,origin.x)+'px',top:Math.min(y,origin.y)+'px',width:w+'px',height:h+'px'});$('width').value=w;$('height').value=h;$('sizeTag').textContent=w+' × '+h+' px';$('error').textContent='';}
+selector.addEventListener('pointermove',selectMove);
+selector.addEventListener('pointerup',e=>{if(e.pointerId!==selectedPointer)return;selectMove(e);selectedPointer=null;origin=null;});
+selector.addEventListener('pointercancel',()=>{selectedPointer=null;origin=null;});
+$('full').onclick=()=>{$('width').value=$('height').value='full';rect.style.display='none';$('error').textContent='';};
+$('settings').onsubmit=e=>{e.preventDefault();const w=parseDimension($('width').value),h=parseDimension($('height').value);if(w===null||h===null){$('error').textContent='Enter a positive whole number or full for each dimension.';return;}const url=new URL(location.href);url.searchParams.set('width',w);url.searchParams.set('height',h);history.pushState({},'',url);apply(w,h);};
+function point(e){const b=canvas.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top};}
+canvas.addEventListener('pointerdown',e=>{if(mode!=='draw'||e.button!==0||drawingPointer!==null)return;drawingPointer=e.pointerId;canvas.setPointerCapture(e.pointerId);active=[point(e)];strokes.push(active);render();});
+canvas.addEventListener('pointermove',e=>{if(e.pointerId!==drawingPointer||!active)return;active.push(point(e));render();});
+function finish(e){if(e.pointerId===drawingPointer){drawingPointer=null;active=null;}}
+canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);canvas.addEventListener('lostpointercapture',finish);
+$('clear').onclick=()=>{strokes=[];active=null;drawingPointer=null;render();$('status').textContent='Canvas cleared';};
+$('resize').onclick=openSettings;
+window.addEventListener('resize',()=>{if(mode==='draw')render();});window.addEventListener('popstate',loadURL);loadURL();
+</script>
+</body>
+</html>

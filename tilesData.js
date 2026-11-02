@@ -16,5 +16,6 @@ const tilesData = [
     { name: "Chartjs Example", link: "https://ajoealex.github.io/static-sites/apps/chartjs/chartjs.html" },
     { name: "scroll test", link: "https://ajoealex.github.io/static-sites/apps/scroll-test/index.html" },
     { name: "Complex Tables", link: "https://ajoealex.github.io/static-sites/apps/complex_tables/tables-demo.html" },
-    { name: "Download Test", link: "https://ajoealex.github.io/static-sites/apps/download-test/index.html" }
+    { name: "Download Test", link: "https://ajoealex.github.io/static-sites/apps/download-test/index.html" },
+    { name: "Canvas Draw", link: "https://ajoealex.github.io/static-sites/apps/canvas-draw/index.html" }
 ];
